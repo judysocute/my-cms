@@ -2,49 +2,57 @@ package com.judysocute.model;
 
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity(name = "authors")
 public class Author {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	private String name;
-	
-	private String company;
-	
+
+	private String jobTitle;
+
 	private String shortBio;
-	
+
 	private String email;
-	
+
 	private String phone;
-	
+
 	private String city;
-	
+
 	private String linkedIn;
-	
+
 	private String github;
-	
-	private String image;
-	
+
+	@OneToOne
+    @JoinColumn(name = "image_id")
+	private Media image;
+
 	private String education;
-	
+
 	private Set<String> skills;
-	
+
 	private String experience;
-	
+
 	// ---------------------------------
-	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="author")
-    private Set<Post> posts;
-	
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
+	private Set<Post> posts;
+
 	// ---------------------------------
 
 	public Long getId() {
@@ -54,21 +62,13 @@ public class Author {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getCompany() {
-		return company;
-	}
-
-	public void setCompany(String company) {
-		this.company = company;
 	}
 
 	public String getShortBio() {
@@ -119,11 +119,11 @@ public class Author {
 		this.github = github;
 	}
 
-	public String getImage() {
+	public Media getImage() {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(Media image) {
 		this.image = image;
 	}
 
@@ -154,5 +154,13 @@ public class Author {
 	public Set<Post> getPosts() {
 		return posts;
 	}
-	
+
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	public void setJobExperience(String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
 }

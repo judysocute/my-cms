@@ -3,10 +3,16 @@ package com.judysocute.model;
 import java.util.Date;
 import java.util.Set;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity(name = "posts")
 public class Post {
@@ -16,7 +22,9 @@ public class Post {
 	
 	private String title;
 	
-	private String heroImage;
+	@OneToOne
+    @JoinColumn(name = "image_id")
+	private Media heroImage;
 	
 	private String description;
 	
@@ -49,11 +57,11 @@ public class Post {
 		this.slug = slug;
 	}
 	
-	public String getHeroImage() {
+	public Media getHeroImage() {
 		return heroImage;
 	}
 	
-	public void setHeroImage(String heroImage) {
+	public void setHeroImage(Media heroImage) {
 		this.heroImage = heroImage;
 	}
 	
