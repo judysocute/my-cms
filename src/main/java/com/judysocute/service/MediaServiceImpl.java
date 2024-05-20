@@ -1,5 +1,6 @@
 package com.judysocute.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -9,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,7 @@ import com.judysocute.repository.MediaRepository;
 public class MediaServiceImpl implements MediaService {
 	
 	@Autowired private MediaRepository mediaRepository;
+	@Autowired ResourceLoader resourceLoader;
 	private final Path rootLocation = Path.of("");
 	
 
@@ -55,20 +58,11 @@ public class MediaServiceImpl implements MediaService {
 			Path destinationFile = this.rootLocation.resolve(
 					Paths.get(fileName))
 					.normalize().toAbsolutePath();
-			System.out.println("rootLocation => " + this.rootLocation.toString());
-			System.out.println("Paths.get(fileName) => " + Paths.get(fileName).toString());
-			System.out.println("destinationFile => " + destinationFile.toString());
-			
-
-			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-				// This is a security check
-				throw new StorageException(
-						"Cannot store file outside current directory.");
-			}
+			Path availableFilePath = getAvailableFilePath(destinationFile);
 
 			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-				media.setImagePath(destinationFile.toString());
+				Files.copy(inputStream, availableFilePath, StandardCopyOption.REPLACE_EXISTING);
+				media.setImagePath(availableFilePath.toString());
 				mediaRepository.save(media);
 			}
 		}
@@ -76,17 +70,24 @@ public class MediaServiceImpl implements MediaService {
 			throw new StorageException("Failed to store file.", e);
 		}
 	}
-
-
-//		@Override
-//	public void init() {
-//		try {
-//			Files.createDirectories(rootLocation);
-//		}
-//		catch (IOException e) {
-//			throw new StorageException("Could not initialize storage", e);
-//		}
-//		
-//	}
-
+	
+	private Path getAvailableFilePath(Path filePath) {
+		if (!Files.exists(filePath)) {
+			return filePath;
+		}
+		File file = filePath.toFile();
+		String name = file.getName();
+        String baseName = name.substring(0, name.lastIndexOf('.'));
+        String extension = name.substring(name.lastIndexOf('.'));
+		
+        int counter = 1;
+        String newFileName;
+        do {
+            newFileName = baseName + "_" + counter + extension;
+            file = new File(newFileName);
+            counter++;
+        } while (file.exists());
+        
+        return Path.of(newFileName);
+	}
 }
