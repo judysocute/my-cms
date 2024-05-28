@@ -11,5 +11,4 @@ public class MyCmsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MyCmsApplication.class, args);
 	}
-
 }
